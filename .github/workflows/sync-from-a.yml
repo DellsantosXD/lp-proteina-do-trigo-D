@@ -13,6 +13,11 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout target (lp-proteina-do-trigo-D)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Checkout source (lp-proteina-do-trigo-A)
         uses: actions/checkout@v4
         with:
@@ -20,11 +25,17 @@ jobs:
           path: source
           fetch-depth: 1
 
-      - name: Force-push source to lp-proteina-do-trigo-D
-        working-directory: source
+      - name: Mirror source into target and push
         run: |
-          git remote remove origin || true
-          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/DellsantosXD/lp-proteina-do-trigo-D.git"
-          git push origin HEAD:main --force
+          rsync -a --delete source/ ./ --exclude .git
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Cópia de lp-proteina-do-trigo-A"
+          git push origin HEAD:main
 
-# run-id: 3
+# run-id: 4
