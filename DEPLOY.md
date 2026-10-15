@@ -2,41 +2,22 @@
 
 Este projeto é uma landing page Vite/React. O deploy recomendado é Cloudflare Pages conectado ao GitHub.
 
-## Opção A — Git no dashboard Cloudflare (recomendado para preview automático)
+## Configuração no Cloudflare Pages
 
-1. Acesse [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages) → **Create** → **Pages** → **Connect to Git**.
-2. Autorize o app **Cloudflare Workers & Pages** no GitHub e selecione o repositório `lp-proteina-do-trigo-D`.
-3. Configuração de build:
+1. Suba este projeto para um repositório no GitHub.
+2. No Cloudflare, vá em **Workers & Pages** > **Create application** > **Pages**.
+3. Escolha **Connect to Git** e selecione o repositório.
+4. Use estas configurações:
 
-| Campo | Valor |
-| --- | --- |
-| Production branch | `main` |
-| Framework preset | Vite |
-| Build command | `npm ci && npm run build` |
-| Build output directory | `dist` |
-| Root directory | *(vazio)* |
-
-4. **Save and Deploy**.
-
-## Opção B — GitHub Actions (já configurado neste repo)
-
-O workflow `.github/workflows/deploy-cloudflare.yml` publica em **Cloudflare Pages** no projeto `lp-proteina-do-trigo-d`.
-
-### Secrets necessários (Settings → Secrets → Actions)
-
-| Secret | Descrição |
-| --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Token com permissão **Account → Cloudflare Pages → Edit** |
-| `CLOUDFLARE_ACCOUNT_ID` | ID da conta Cloudflare |
-
-Se você já usa o repositório **lp-proteina-do-trigo-B**, pode reutilizar os mesmos valores dos secrets.
-
-### Disparar deploy
-
-- Push na branch `main`, ou
-- **Actions** → **Deploy LP Proteina D to Cloudflare Pages** → **Run workflow**
+- **Framework preset:** Vite
+- **Build command:** `npm ci && npm run build`
+- **Build output directory:** `dist`
+- **Root directory:** deixe vazio se este projeto for a raiz do repositório. Use `work/lp-editor` apenas se subir a pasta-mãe inteira.
+- **Production branch:** `main`
 
 ## Fluxo de atualização
+
+Depois de conectado, toda alteração publicada no GitHub dispara deploy automático:
 
 ```bash
 git add .
