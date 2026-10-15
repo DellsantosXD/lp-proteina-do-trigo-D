@@ -18,6 +18,10 @@ jobs:
 
       - name: Push to lp-proteina-do-trigo-D
         working-directory: source
+        env:
+          TARGET_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/DellsantosXD/lp-proteina-do-trigo-D.git
+          git remote set-url origin "https://x-access-token:${TARGET_TOKEN}@github.com/DellsantosXD/lp-proteina-do-trigo-D.git"
           git push origin HEAD:main --force
+
+# run-id: 2
