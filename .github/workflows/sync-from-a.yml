@@ -1,0 +1,23 @@
+name: Sync from lp-proteina-do-trigo-A
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/sync-from-a.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone source repository
+        run: git clone --depth 1 https://github.com/DellsantosXD/lp-proteina-do-trigo-A.git source
+
+      - name: Push to lp-proteina-do-trigo-D
+        working-directory: source
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/DellsantosXD/lp-proteina-do-trigo-D.git
+          git push origin HEAD:main --force
