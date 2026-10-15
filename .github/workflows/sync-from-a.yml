@@ -9,9 +9,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: sync-from-a
+  cancel-in-progress: true
+
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 360
     steps:
       - name: Checkout target (lp-proteina-do-trigo-D)
         uses: actions/checkout@v4
@@ -25,17 +30,30 @@ jobs:
           path: source
           fetch-depth: 1
 
-      - name: Mirror source into target and push
+      - name: Copy files one-by-one and push
         run: |
-          rsync -a --delete source/ ./ --exclude .git
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git commit -m "Cópia de lp-proteina-do-trigo-A"
-          git push origin HEAD:main
+          git config http.postBuffer 524288000
 
-# run-id: 4
+          mapfile -t files < <(cd source && find . -type f ! -path './.git/*' | sed 's|^\./||' | sort)
+          echo "Found ${#files[@]} files to sync"
+
+          for rel in "${files[@]}"; do
+            mkdir -p "$(dirname "$rel")"
+            cp -a "source/$rel" "$rel"
+            git add "$rel"
+            if git diff --staged --quiet; then
+              continue
+            fi
+            git commit -m "Cópia de lp-proteina-do-trigo-A"
+            for attempt in 1 2 3 4 5; do
+              if git pull --rebase origin main && git push origin HEAD:main; then
+                break
+              fi
+              sleep "$attempt"
+            done
+          done
+
+# run-id: 5
